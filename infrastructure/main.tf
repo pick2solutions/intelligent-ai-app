@@ -59,10 +59,10 @@ module "openai_deployments" {
       }
     },
     {
-      name = "textembedding-3-large"
+      name = "text-embedding-3-large"
       model = {
         format  = "OpenAI"
-        name    = "textembedding-3-large"
+        name    = "text-embedding-3-large"
         version = "1"
       }
       sku = {
