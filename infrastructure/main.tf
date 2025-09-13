@@ -55,14 +55,14 @@ module "openai_deployments" {
       }
       sku = {
         name     = "GlobalStandard"
-        capacity = 200
+        capacity = 50
       }
     },
     {
-      name = "textembedding-3-small"
+      name = "textembedding-3-large"
       model = {
         format  = "OpenAI"
-        name    = "textembedding-3-small"
+        name    = "textembedding-3-large"
         version = "1"
       }
       sku = {
@@ -137,7 +137,7 @@ module "ai_search" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   search_service_name = "pick2aiappsearch"
-  sku                 = "free"
+  sku                 = "basic"
   storage_account_id  = azurerm_storage_account.ai_search_data.id
 
   #   datasource_jsons = {
