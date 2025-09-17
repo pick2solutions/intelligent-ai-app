@@ -1,10 +1,10 @@
-name: Terraform Deploy
 
+name: Terraform Deploy
 on:
-    push:
-        branches:
-        - main
-    workflow_dispatch:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 permissions:
   id-token: write
@@ -15,6 +15,9 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
     environment: main
+    defaults:
+      run:
+        working-directory: infrastructure
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,18 +44,18 @@ jobs:
       - name: Terraform Init
         run: terraform init -backend-config=backend.conf
         env:
-            ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
-            ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-            ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
         env:
-            ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
-            ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-            ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-            TF_VAR_azure_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-            TF_VAR_azure_ai_token: ${{ env.AZURE_AI_TOKEN }}
+          ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          TF_VAR_azure_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          TF_VAR_azure_ai_token: ${{ env.AZURE_AI_TOKEN }}
 
       - name: Approve Terraform Plan
         uses: trstringer/manual-approval@v1
@@ -63,8 +66,8 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
         env:
-            ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
-            ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-            ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-            TF_VAR_azure_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-            TF_VAR_azure_ai_token: ${{ env.AZURE_AI_TOKEN }}
+          ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          TF_VAR_azure_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          TF_VAR_azure_ai_token: ${{ env.AZURE_AI_TOKEN }}
