@@ -13,7 +13,7 @@ resource "azurerm_resource_group" "main" {
 ## AI Foundry Account and Project
 ## ------
 module "ai_foundry" {
-  source = "git::https://github.com/pick2solutions/pick2-iac-core.git//azure/ai-project?ref=main"
+  source = "./modules/ai-project"
 
   name                 = "pick2-intelligent-app-foundry"
   location             = azurerm_resource_group.main.location
@@ -23,10 +23,9 @@ module "ai_foundry" {
   key_vault_name       = "pick2aiappkv"
 
   foundry_projects = {
-    "intelligent-app-demo" = {
+    intelligent-app-demo = {
       friendly_name = "Intelligent App Demo"
       description   = "Demo project for the Pick2 Intelligent AI App platform."
-      unique_id     = random_string.unique_suffix.result
     }
   }
 }
@@ -35,7 +34,7 @@ module "ai_foundry" {
 ## AI Model Deployments
 ## ------
 module "openai_deployments" {
-  source = "git::https://github.com/pick2solutions/pick2-iac-core.git//azure/ai-cognitive-service?ref=main"
+  source = "./modules/ai-cognitive-service"
 
   name                     = "openai-services"
   location                 = azurerm_resource_group.main.location
@@ -81,7 +80,7 @@ module "openai_deployments" {
 provider "restapi" {
   alias = "ai_foundry"
 
-  uri                   = "https://pick2-intelligent-app-foundry.services.ai.azure.com/api/projects/intelligent-app-demo-${random_string.unique_suffix.result}"
+  uri                   = "https://pick2-intelligent-app-foundry.services.ai.azure.com/api/projects/intelligent-app-demo"
   debug                 = true
   write_returns_object  = true
   create_returns_object = true
@@ -93,13 +92,13 @@ provider "restapi" {
 }
 
 module "recruiter_agent" {
-  source = "git::https://github.com/pick2solutions/pick2-iac-core.git//azure/ai-agent?ref=main"
+  source = "./modules/ai-agent"
 
   providers = {
     restapi.ai_foundry = restapi.ai_foundry
   }
 
-  project_endpoint    = "https://pick2-intelligent-app-foundry.services.ai.azure.com/api/projects/intelligent-app-demo-${random_string.unique_suffix.result}"
+  project_endpoint    = "https://pick2-intelligent-app-foundry.services.ai.azure.com/api/projects/intelligent-app-demo"
   azure_ai_token      = var.azure_ai_token
   agents = {
     recruiter = {
@@ -132,35 +131,11 @@ resource "azurerm_storage_account" "ai_search_data" {
 }
 
 module "ai_search" {
-  source = "git::https://github.com/pick2solutions/pick2-iac-core.git//azure/cognitive-search?ref=main"
+  source = "./modules/cognitive-search"
 
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   search_service_name = "pick2aiappsearch"
   sku                 = "basic"
   storage_account_id  = azurerm_storage_account.ai_search_data.id
-
-  #   datasource_jsons = {
-  #     for file_name in fileset("${path.module}/data-sources", "*.json") :
-  #     file_name => templatefile("${path.module}/data-sources/${file_name}", {
-  #       search_service_name  = "pick2aiappsearch"
-  #       storage_account_name = ""
-  #     })
-  #   }
-
-  #   index_jsons = {
-  #     for file_name in fileset("${path.module}/indexes", "*.json") :
-  #     file_name => templatefile("${path.module}/indexes/${file_name}", {
-  #       search_service_name = "pick2aiappsearch"
-  #       openai_name         = ""
-  #       foundry_name        = module.ai_foundry.account.name
-  #     })
-  #   }
-
-  #   indexer_jsons = {
-  #     for file_name in fileset("${path.module}/indexers", "*.json") :
-  #     file_name => templatefile("${path.module}/indexers/${file_name}", {
-  #       search_service_name = "pick2aiappsearch"
-  #     })
-  #   }
 }
