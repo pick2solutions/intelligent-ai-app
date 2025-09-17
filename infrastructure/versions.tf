@@ -11,13 +11,7 @@ terraform {
     }
   }
 
-  backend "azurerm" {
-    resource_group_name  = "pick2_terraform"
-    storage_account_name = "pick2terraform"
-    container_name       = "tfstate"
-    key                  = "ai-demo.terraform.tfstate"
-    subscription_id      = "06c81f33-20f5-4c88-81f0-c02c1cfc158f"
-  }
+  backend "azurerm" {}
 }
 
 provider "azurerm" {
